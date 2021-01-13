@@ -143,7 +143,7 @@ fn run_app() -> Result<(), ()> {
     channel.set_items(items_extra);
 
     // And write the new file
-    let mut outfile = tempfile_fast::Sponge::new_for("/home/olav/src/rss-combine/rss-out.xml").unwrap();
+    let mut outfile = tempfile_fast::Sponge::new_for(&opt.input).unwrap();
     channel.pretty_write_to(&mut outfile, b' ', 2).unwrap(); // // write to the channel to a writer
     outfile.commit().expect("Cannot store merged RSS back into main RSS file");
 
