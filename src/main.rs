@@ -1,30 +1,30 @@
 use std::path::PathBuf;
-use structopt::StructOpt;
+use clap::Parser;
 
 
-#[derive(Debug, StructOpt)]
-#[structopt(name = "rss-combine", about = "Merge entries from multiple rss files.")]
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
 struct Opt {
     /// Maximum number of entries in the RSS; use 0 for unlimited entries
-    #[structopt(short = "l", default_value = "0")]
+    #[arg(short = 'l', default_value = "0")]
     max_entries: usize,
 
     /// Print more details to stdout
-    #[structopt(short, long)]
+    #[arg(short, long)]
     verbose: bool,
 
     /// Main RSS file
-    #[structopt(parse(from_os_str))]
+    #[arg(value_parser)]
     input: PathBuf,
 
     /// Additional files
-    #[structopt(parse(from_os_str), required = true)]
+    #[arg(value_parser, required = true)]
     files: Vec<PathBuf>,
 
 }
 
 fn run_app() -> Result<(), ()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     use std::fs::File;
     use std::io::BufReader;

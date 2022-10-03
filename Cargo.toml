@@ -3,11 +3,12 @@ name = "rss-combine"
 version = "0.1.0"
 authors = ["Olav Vitters <olav@vitters.nl>"]
 edition = "2018"
+description = "Merge entries from multiple rss files."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-structopt = "0.3"
+clap = { version = "4.0", features = ["derive", "wrap_help"] }
 tempfile-fast = "0.3"
 rss = { version = ">=1.9" }
 #rss = { version = "1.9.0", features = ["from_url"] }
