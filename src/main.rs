@@ -1,6 +1,5 @@
-use std::path::PathBuf;
 use clap::Parser;
-
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -20,16 +19,15 @@ struct Opt {
     /// Additional files
     #[arg(value_parser, required = true)]
     files: Vec<PathBuf>,
-
 }
 
 fn run_app() -> Result<(), ()> {
     let opt = Opt::parse();
 
-    use std::fs::File;
-    use std::io::BufReader;
     use rss::Channel;
     use std::collections::HashSet;
+    use std::fs::File;
+    use std::io::BufReader;
 
     // Keep a list of known GUIDs to prevent duplicate RSS entries
     let mut known_guids = HashSet::new();
@@ -69,8 +67,12 @@ fn run_app() -> Result<(), ()> {
         let file2 = match File::open(&rss_filename) {
             Ok(file2) => file2,
             Err(error) => {
-                eprintln!("WARNING: Skipping unreadable RSS file {}: {}", rss_filename.display(), error);
-                continue
+                eprintln!(
+                    "WARNING: Skipping unreadable RSS file {}: {}",
+                    rss_filename.display(),
+                    error
+                );
+                continue;
             }
         };
         // The channel variable is reused so that the merged RSS contains the fields from the
@@ -78,8 +80,12 @@ fn run_app() -> Result<(), ()> {
         channel = match Channel::read_from(BufReader::new(file2)) {
             Ok(channel) => channel,
             Err(error) => {
-                eprintln!("WARNING: Skipping unparseble RSS file {}: {}", rss_filename.display(), error);
-                continue
+                eprintln!(
+                    "WARNING: Skipping unparseble RSS file {}: {}",
+                    rss_filename.display(),
+                    error
+                );
+                continue;
             }
         };
 
@@ -96,16 +102,16 @@ fn run_app() -> Result<(), ()> {
         while i != vec_items.len() {
             let guid = match vec_items[i].guid() {
                 Some(guid) => guid,
-                None       => {
+                None => {
                     nr_missing_guids += 1;
-                    i +=1;
+                    i += 1;
                     continue;
                 }
             };
 
             if known_guids.contains(guid.value()) {
                 i += 1;
-                continue
+                continue;
             }
 
             known_guids.insert(guid.value().to_string());
@@ -115,24 +121,27 @@ fn run_app() -> Result<(), ()> {
 
     // Mention anything weird in the data
     if nr_missing_guids > 0 {
-        eprintln!("WARNING: Ignored {} RSS entres without a GUID", nr_missing_guids);
+        eprintln!(
+            "WARNING: Ignored {} RSS entres without a GUID",
+            nr_missing_guids
+        );
     }
 
     // We only rewrite the RSS in case there are additional entires
     //
     // Updates of any other field is not important
     if items_extra.is_empty() {
-       if opt.verbose {
-           println!("No changes made");
+        if opt.verbose {
+            println!("No changes made");
         }
-        return Ok(())
+        return Ok(());
     }
 
     // Combine all entries into items_extra
     items_extra.append(&mut items_orig); // this clears items_orig
 
     // The number of entries is only limited in case entries are merged
-    if opt.max_entries > 0 && items_extra.len() > opt.max_entries  {
+    if opt.max_entries > 0 && items_extra.len() > opt.max_entries {
         if opt.verbose {
             println!("Restricting RSS size to newest {} entries", opt.max_entries);
         }
@@ -145,11 +154,12 @@ fn run_app() -> Result<(), ()> {
     // And write the new file
     let mut outfile = tempfile_fast::Sponge::new_for(&opt.input).unwrap();
     channel.pretty_write_to(&mut outfile, b' ', 2).unwrap(); // // write to the channel to a writer
-    outfile.commit().expect("Cannot store merged RSS back into main RSS file");
+    outfile
+        .commit()
+        .expect("Cannot store merged RSS back into main RSS file");
 
     Ok(())
 }
-
 
 fn main() {
     std::process::exit(match run_app() {
