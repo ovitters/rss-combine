@@ -121,7 +121,7 @@ fn run_app() -> Result<(), ()> {
     // We only rewrite the RSS in case there are additional entires
     //
     // Updates of any other field is not important
-    if items_extra.len() == 0 {
+    if items_extra.is_empty() {
        if opt.verbose {
            println!("No changes made");
         }
