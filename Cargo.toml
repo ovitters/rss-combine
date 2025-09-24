@@ -2,7 +2,7 @@
 name = "rss-combine"
 version = "0.1.0"
 authors = ["Olav Vitters <olav@vitters.nl>"]
-edition = "2021"
+edition = "2024"
 description = "Merge entries from multiple rss files."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
